@@ -34,3 +34,6 @@ public class AuthService {
         return user;
     }
 }
+
+//유저 추가
+//curl.exe -X POST "http://localhost:8080/api/auth/register?email=test@test.com&password=1234"
