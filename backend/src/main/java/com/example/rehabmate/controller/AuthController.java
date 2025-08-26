@@ -1,6 +1,14 @@
+package com.example.rehabmate.controller;
+
+import com.example.rehabmate.entity.User;
+import com.example.rehabmate.service.AuthService;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 @RestController
 @RequestMapping("/api/auth")
-
 public class AuthController {
     private final AuthService authService;
 
@@ -8,14 +16,12 @@ public class AuthController {
         this.authService = authService;
     }
 
-    // 회원가입
     @PostMapping("/register")
     public User register(@RequestParam String email,
                          @RequestParam String password) {
         return authService.register(email, password);
     }
 
-    // 로그인
     @PostMapping("/login")
     public User login(@RequestParam String email,
                       @RequestParam String password) {

@@ -1,5 +1,11 @@
-@Service
+package com.example.rehabmate.service;
 
+import com.example.rehabmate.entity.User;
+import com.example.rehabmate.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+@Service
 public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -9,18 +15,16 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // 회원가입
     public User register(String email, String rawPassword) {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new RuntimeException("이미 가입된 이메일입니다.");
         }
         User user = new User();
         user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(rawPassword)); // 비밀번호 암호화
+        user.setPassword(passwordEncoder.encode(rawPassword));
         return userRepository.save(user);
     }
 
-    // 로그인
     public User login(String email, String rawPassword) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
