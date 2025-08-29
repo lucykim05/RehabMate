@@ -1,30 +1,45 @@
 package com.example.rehabmate.controller;
 
+import com.example.rehabmate.dto.UserResponseDto;
 import com.example.rehabmate.entity.User;
+import com.example.rehabmate.security.JwtUtil;
 import com.example.rehabmate.service.AuthService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
     private final AuthService authService;
+    private final JwtUtil jwtUtil;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, JwtUtil jwtUtil) {
         this.authService = authService;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/register")
-    public User register(@RequestParam String email,
-                         @RequestParam String password) {
-        return authService.register(email, password);
+    public ResponseEntity<UserResponseDto> register(@RequestParam String email,
+                                                    @RequestParam String password) {
+        User user = authService.register(email, password);
+        return ResponseEntity.ok(new UserResponseDto(user.getId(), user.getEmail(), user.getCreatedAt()));
     }
 
     @PostMapping("/login")
-    public User login(@RequestParam String email,
-                      @RequestParam String password) {
-        return authService.login(email, password);
+    public ResponseEntity<?> login(@RequestParam String email,
+                                   @RequestParam String password) {
+        User user = authService.login(email, password);
+
+        if (user != null) {
+            String token = jwtUtil.generateToken(user.getEmail());
+            return ResponseEntity.ok(Map.of(
+                    "accessToken", token,
+                    "email", user.getEmail()
+            ));
+        } else {
+            return ResponseEntity.status(401).body("Invalid credentials");
+        }
     }
 }
