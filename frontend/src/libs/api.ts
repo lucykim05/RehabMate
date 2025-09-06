@@ -1,16 +1,29 @@
-import axios from 'axios';
+const BASE_URL = 'http://localhost:8080/api';
 
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
-});
+export async function register(email: string, password: string) {
+  const res = await fetch(`${BASE_URL}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken');
-  if (token) {
-    config.headers = config.headers ?? {};
-    config.headers['Authorization'] = `Bearer ${token}`;
+  if (!res.ok) {
+    throw new Error('회원가입 실패');
   }
-  return config;
-});
 
-export default api;
+  return res.json(); // UserResponseDto
+}
+
+export async function login(email: string, password: string) {
+  const res = await fetch(`${BASE_URL}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!res.ok) {
+    throw new Error('로그인 실패');
+  }
+
+  return res.json(); // { accessToken, email }
+}
