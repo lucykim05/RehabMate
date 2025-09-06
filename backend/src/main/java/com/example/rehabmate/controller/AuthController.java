@@ -1,5 +1,7 @@
 package com.example.rehabmate.controller;
 
+import com.example.rehabmate.dto.UserRegisterRequestDto;
+import com.example.rehabmate.dto.UserLoginRequestDto;
 import com.example.rehabmate.dto.UserResponseDto;
 import com.example.rehabmate.entity.User;
 import com.example.rehabmate.security.JwtUtil;
@@ -21,25 +23,18 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDto> register(@RequestParam String email,
-                                                    @RequestParam String password) {
-        User user = authService.register(email, password);
+    public ResponseEntity<UserResponseDto> register(@RequestBody UserRegisterRequestDto request) {
+        User user = authService.register(request.email(), request.password());
         return ResponseEntity.ok(new UserResponseDto(user.getId(), user.getEmail(), user.getCreatedAt()));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestParam String email,
-                                   @RequestParam String password) {
-        User user = authService.login(email, password);
-
-        if (user != null) {
-            String token = jwtUtil.generateToken(user.getEmail());
-            return ResponseEntity.ok(Map.of(
-                    "accessToken", token,
-                    "email", user.getEmail()
-            ));
-        } else {
-            return ResponseEntity.status(401).body("Invalid credentials");
-        }
+    public ResponseEntity<?> login(@RequestBody UserLoginRequestDto request) {
+        User user = authService.login(request.email(), request.password());
+        String token = jwtUtil.generateToken(user.getEmail());
+        return ResponseEntity.ok(Map.of(
+                "accessToken", token,
+                "email", user.getEmail()
+        ));
     }
 }
