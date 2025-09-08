@@ -1,9 +1,17 @@
-'use client';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import Logo from '@/components/Logo';
 
-export default function Home() {
+export default async function LandingPage() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('accessToken')?.value;
+
+  if (!token) {
+    redirect('/login');
+  }
+
   return (
-    <main className="min-h-screen p-8">
+    <main>
       <div className="flex justify-center mb-8">
         <Logo size="large" />
       </div>
